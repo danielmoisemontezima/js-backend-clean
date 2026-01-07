@@ -1,10 +1,12 @@
-export interface SubscriptionOrder {
-  id: number;
-  external_id: string;
-  user_id: number;
-  subscription_id: number;
-  status: "pending" | "processing" | "completed" | "failed";
-  payment_reference: string | null;
-  created_at: Date;
-  updated_at: Date;
+export class SubscriptionOrder {
+  constructor(
+    public readonly id: number,
+    public readonly externalId: string,
+    public readonly userId: number,
+    public readonly subscriptionId: number,
+    public status: "pending" | "processing" | "completed" | "failed",
+    public paymentReference: string | null,
+    public readonly createdAt: Date,
+    public updatedAt: Date
+  ) {}
 }

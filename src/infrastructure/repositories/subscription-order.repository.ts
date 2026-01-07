@@ -1,22 +1,36 @@
-import { Client } from "pg";
+import { IDatabaseClient } from "../database/interfaces/IDatabaseClient";
+import { SubscriptionOrder } from "../../domain/entities/subscription-order.entity";
 import { ISubscriptionOrderRepository } from "../../domain/interfaces/ISubscriptionOrderRepository";
 
 export class SubscriptionOrderRepository implements ISubscriptionOrderRepository {
-  constructor(private db: Client) {}
+  constructor(private db: IDatabaseClient) {}
 
-  async findById(id: number) {
+  private mapRowToEntity(row: any): SubscriptionOrder {
+    return new SubscriptionOrder(
+      row.id,
+      row.external_id,
+      row.user_id,
+      row.subscription_id,
+      row.status,
+      row.payment_reference,
+      row.created_at,
+      row.updated_at
+    );
+  }
+
+  async findById(id: number): Promise<SubscriptionOrder | null> {
     const result = await this.db.query(
       `SELECT * FROM subscription_orders WHERE id = $1`,
       [id]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
-  async findPending() {
+  async findPending(): Promise<SubscriptionOrder[]> {
     const result = await this.db.query(
       `SELECT * FROM subscription_orders WHERE status = 'pending'`
     );
-    return result.rows;
+    return result.rows.map(row => this.mapRowToEntity(row));
   }
 
   async create(data: {
@@ -24,7 +38,7 @@ export class SubscriptionOrderRepository implements ISubscriptionOrderRepository
     subscriptionId: number;
     status: "pending" | "processing" | "completed" | "failed";
     paymentReference?: string;
-  }) {
+  }): Promise<SubscriptionOrder> {
     const result = await this.db.query(
       `
       INSERT INTO subscription_orders
@@ -39,10 +53,10 @@ export class SubscriptionOrderRepository implements ISubscriptionOrderRepository
         data.paymentReference || null,
       ]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 
-  async updateStatus(id: number, status: string) {
+  async updateStatus(id: number, status: string): Promise<SubscriptionOrder> {
     const result = await this.db.query(
       `
       UPDATE subscription_orders
@@ -52,6 +66,6 @@ export class SubscriptionOrderRepository implements ISubscriptionOrderRepository
       `,
       [status, id]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 }

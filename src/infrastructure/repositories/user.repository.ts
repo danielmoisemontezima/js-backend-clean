@@ -1,34 +1,47 @@
-import { Client } from "pg";
+import { IDatabaseClient } from "../database/interfaces/IDatabaseClient";
+import { User } from "../../domain/entities/user.entity";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 
 export class UserRepository implements IUserRepository {
-  constructor(private db: Client) {}
+  constructor(private db: IDatabaseClient) {}
 
-  async findById(id: number) {
+  private mapRowToEntity(row: any): User { 
+    return new User(
+      row.id,
+      row.external_id,
+      row.email,
+      row.password_hash,
+      row.name,
+      row.created_at,
+      row.updated_at
+    );
+  }
+
+  async findById(id: number): Promise<User | null> {
     const result = await this.db.query(
       `SELECT * FROM users WHERE id = $1`,
       [id]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
-  async findByExternalId(externalId: string) {
+  async findByExternalId(externalId: string): Promise<User | null> {
     const result = await this.db.query(
       `SELECT * FROM users WHERE external_id = $1`,
       [externalId]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User | null> {
     const result = await this.db.query(
       `SELECT * FROM users WHERE email = $1`,
       [email]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
-  async create(data: { email: string; passwordHash: string; name?: string }) {
+  async create(data: { email: string; passwordHash: string; name?: string }): Promise<User> {
     const result = await this.db.query(
       `
       INSERT INTO users (external_id, email, password_hash, name)
@@ -37,6 +50,6 @@ export class UserRepository implements IUserRepository {
       `,
       [data.email, data.passwordHash, data.name || null]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 }

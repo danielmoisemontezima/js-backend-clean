@@ -1,9 +1,11 @@
-export interface UserSubscription {
-  id: number;
-  user_id: number;
-  subscription_id: number;
-  start_date: Date;
-  end_date: Date;
-  status: "active" | "expired" | "cancelled";
-  created_at: Date;
+export class UserSubscription {
+  constructor(
+    public readonly id: number,
+    public readonly userId: number,
+    public readonly subscriptionId: number,
+    public startDate: Date,
+    public endDate: Date,
+    public status: "active" | "expired" | "cancelled",
+    public readonly createdAt: Date
+  ) {}
 }

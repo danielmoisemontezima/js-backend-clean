@@ -1,10 +1,23 @@
-import { Client } from "pg";
+import { IDatabaseClient } from "../database/interfaces/IDatabaseClient";
+import { UserSubscription } from "../../domain/entities/user-subscription.entity";
 import { IUserSubscriptionRepository } from "../../domain/interfaces/IUserSubscriptionRepository";
 
 export class UserSubscriptionRepository implements IUserSubscriptionRepository {
-  constructor(private db: Client) {}
+  constructor(private db: IDatabaseClient) {}
 
-  async findActiveByUserId(userId: number) {
+  private mapRowToEntity(row: any) : UserSubscription {
+    return new UserSubscription (
+      row.id,
+      row.user_id,
+      row.subscription_id,
+      row.start_date,
+      row.end_date,
+      row.status,
+      row.created_at,
+    );
+  }
+
+  async findActiveByUserId(userId: number): Promise<UserSubscription | null> {
     const result = await this.db.query(
       `
       SELECT *
@@ -15,7 +28,7 @@ export class UserSubscriptionRepository implements IUserSubscriptionRepository {
       `,
       [userId]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
   async create(data: {
@@ -24,7 +37,7 @@ export class UserSubscriptionRepository implements IUserSubscriptionRepository {
     startDate: Date;
     endDate: Date;
     status: "active" | "expired" | "cancelled";
-  }) {
+  }): Promise<UserSubscription> {
     const result = await this.db.query(
       `
       INSERT INTO user_subscriptions
@@ -40,10 +53,10 @@ export class UserSubscriptionRepository implements IUserSubscriptionRepository {
         data.status,
       ]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 
-  async updateStatus(id: number, status: string) {
+  async updateStatus(id: number, status: string): Promise<UserSubscription> {
     const result = await this.db.query(
       `
       UPDATE user_subscriptions
@@ -53,6 +66,6 @@ export class UserSubscriptionRepository implements IUserSubscriptionRepository {
       `,
       [status, id]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 }

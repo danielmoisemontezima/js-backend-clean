@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { db } from "./client";
 import fs from "fs";
 import path from "path";
+import { Client } from "pg";
+import { databaseConfig } from "./config/database";
 
-async function ensureSeedersTable(client: any) {
+async function ensureSeedersTable(client: Client) {
   await client.query(`
     CREATE TABLE IF NOT EXISTS seeders (
       id SERIAL PRIMARY KEY,
@@ -16,7 +17,11 @@ async function ensureSeedersTable(client: any) {
 }
 
 async function runSeeders(direction: "up" | "down") {
-  const client = await db.connect();
+  const client = new Client({
+    connectionString: databaseConfig.url,
+    ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : false,
+  });
+  await client.connect();
 
   try {
     await ensureSeedersTable(client);
@@ -69,7 +74,7 @@ async function runSeeders(direction: "up" | "down") {
 
     console.log(`Seeders ${direction} completed`);
   } finally {
-    client.release();
+    await client.end();
   }
 }
 

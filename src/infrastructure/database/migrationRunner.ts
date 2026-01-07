@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { db } from "./client";
+import { databaseConfig } from "./config/database";
+import { Client } from "pg";
 import fs from "fs";
 import path from "path";
 
-async function ensureMigrationsTable(client: any) {
+async function ensureMigrationsTable(client: Client) {
   await client.query(`
     CREATE TABLE IF NOT EXISTS migrations (
       id SERIAL PRIMARY KEY,
@@ -16,7 +17,11 @@ async function ensureMigrationsTable(client: any) {
 }
 
 async function runMigrations(direction: "up" | "down") {
-  const client = await db.connect();
+    const client = new Client({
+      connectionString: databaseConfig.url,
+      ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : false, 
+    });
+    await client.connect();
 
   try {
     await ensureMigrationsTable(client);
@@ -69,7 +74,7 @@ async function runMigrations(direction: "up" | "down") {
 
     console.log(`Migrations ${direction} completed`);
   } finally {
-    client.release();
+    await client.end();
   }
 }
 

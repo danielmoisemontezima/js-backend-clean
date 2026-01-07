@@ -1,8 +1,10 @@
-export interface Subscription {
-  id: number;
-  external_id: string;
-  name: string;
-  price: number;
-  duration_days: number;
-  created_at: Date;
+export class Subscription {
+  constructor(
+    public readonly id: number,
+    public readonly externalId: string,
+    public name: string,
+    public price: number,
+    public durationDays: number,
+    public readonly createdAt: Date
+  ) {}
 }

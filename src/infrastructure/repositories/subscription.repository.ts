@@ -1,23 +1,35 @@
-import { Client } from "pg";
+import { IDatabaseClient } from "../database/interfaces/IDatabaseClient";
+import { Subscription } from "../../domain/entities/subscription.entity";
 import { ISubscriptionRepository } from "../../domain/interfaces/ISubscriptionRepository";
 
 export class SubscriptionRepository implements ISubscriptionRepository {
-  constructor(private db: Client) {}
+  constructor(private db: IDatabaseClient) {}
 
-  async findAll() {
-    const result = await this.db.query(`SELECT * FROM subscriptions`);
-    return result.rows;
+  private mapRowToEntity(row: any): Subscription {
+    return new Subscription(
+      row.id,
+      row.external_id,
+      row.name,
+      row.price,
+      row.duration_days,
+      row.created_at
+    );
   }
 
-  async findById(id: number) {
+  async findAll(): Promise<Subscription[]> {
+    const result = await this.db.query(`SELECT * FROM subscriptions`);
+    return result.rows.map(row => this.mapRowToEntity(row));
+  }
+
+  async findById(id: number): Promise<Subscription | null> {
     const result = await this.db.query(
       `SELECT * FROM subscriptions WHERE id = $1`,
       [id]
     );
-    return result.rows[0] || null;
+    return this.mapRowToEntity(result.rows[0]) || null;
   }
 
-  async create(data: { name: string; price: number; durationDays: number }) {
+  async create(data: { name: string; price: number; durationDays: number }): Promise<Subscription> {
     const result = await this.db.query(
       `
       INSERT INTO subscriptions (name, price, duration_days)
@@ -26,6 +38,6 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       `,
       [data.name, data.price, data.durationDays]
     );
-    return result.rows[0];
+    return this.mapRowToEntity(result.rows[0]);
   }
 }
