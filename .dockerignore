@@ -1,0 +1,19 @@
+# Ignore node modules and build outputs (install inside container)
+node_modules
+dist
+
+# Git
+.git
+.gitignore
+
+# Local env and editor files
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+
+# Logs and caches
+*.log
+*.tsbuildinfo
+coverage
