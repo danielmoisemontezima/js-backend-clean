@@ -11,14 +11,16 @@ Make sure you have installed:
 
 Create a `.env` file in the same directory as `docker-compose.yaml`:
 
-PG_DB_USER=...  
-PG_DB_PASSWORD=...  
-PG_DB_NAME=...  
-PG_DB_SSL=false  
-PG_MAX_CONNECTIONS=10  
-PORT=3000  
-JWT_SECRET=your_jwt_secret_key  
-NODE_ENV=production  
+```config
+PG_DB_USER=...
+PG_DB_PASSWORD=...
+PG_DB_NAME=...
+PG_DB_SSL=false 
+PG_MAX_CONNECTIONS=10
+PORT=3000
+JWT_SECRET=your_jwt_secret_key
+NODE_ENV=production
+```
 
 ## 2. Start the Application
 
@@ -47,21 +49,24 @@ Use this endpoint to register a new user.
 
 Request Body:
 
+```json
 {
   "email": "example@example.com",
   "password": "your-password"
   "name": "John"
 }
+```
 
 Response Example (200 OK):
 
+```json
 {
     "id": "8b7181fa-bbb4-40cc-ad83-a2472e98f0b4",
     "email": "example@example.com",
     "name": "John",
     "createdAt": "2026-01-08T14:20:20.265Z"
 }
-
+```
 ---
 
 ### Login
@@ -71,18 +76,21 @@ Returns a JWT token for authenticated requests.
 
 Request Body Example:
 
+```json
 {
   "email": "example@example.com",
-  "password": "your-password"
+  "password": "your-password" 
 }
+```
 
 Response Example (200 OK):
 
+```json
 {
   "id": "JWT_TOKEN_HERE",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6....."
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6....." 
 }
-
+```
 ---
 
 ### Get Authenticated User Profile
@@ -94,11 +102,13 @@ Authorization: Bearer <your-token>
 
 Response Example:
 
-{
+```json
+{ 
     "id": "8b7181fa-bbb4-40cc-ad83-a2472e98f0b4",
     "email": "example@example.com",
     "name": "Jonh"
 }
+```
 
 ## 4. Stopping the Services
 
