@@ -143,7 +143,7 @@ DB_MAX_CONNECTIONS=10
 
 ---
 
-# 🐳 Starting the PostgreSQL Database
+# Starting the PostgreSQL Database
 
 This project includes a Docker Compose setup for running PostgreSQL locally.
 

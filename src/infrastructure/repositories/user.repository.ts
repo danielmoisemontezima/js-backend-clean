@@ -5,7 +5,7 @@ import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 export class UserRepository implements IUserRepository {
   constructor(private db: IDatabaseClient) {}
 
-  private mapRowToEntity(row: any): User { 
+  private mapRowToEntity(row: any): User {
     return new User(
       row.id,
       row.external_id,
@@ -22,7 +22,10 @@ export class UserRepository implements IUserRepository {
       `SELECT * FROM users WHERE id = $1`,
       [id]
     );
-    return this.mapRowToEntity(result.rows[0]) || null;
+
+
+
+    return result.rows.length !== 0 ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async findByExternalId(externalId: string): Promise<User | null> {
@@ -30,7 +33,8 @@ export class UserRepository implements IUserRepository {
       `SELECT * FROM users WHERE external_id = $1`,
       [externalId]
     );
-    return this.mapRowToEntity(result.rows[0]) || null;
+
+    return result.rows.length !== 0 ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -38,7 +42,7 @@ export class UserRepository implements IUserRepository {
       `SELECT * FROM users WHERE email = $1`,
       [email]
     );
-    return this.mapRowToEntity(result.rows[0]) || null;
+    return result.rows.length !== 0 ? this.mapRowToEntity(result.rows[0]) : null;
   }
 
   async create(data: { email: string; passwordHash: string; name?: string }): Promise<User> {
@@ -50,6 +54,7 @@ export class UserRepository implements IUserRepository {
       `,
       [data.email, data.passwordHash, data.name || null]
     );
+    
     return this.mapRowToEntity(result.rows[0]);
   }
 }
