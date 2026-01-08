@@ -1,3 +1,124 @@
+# Quickstart: Run the API with Docker
+
+This project includes a full Docker setup for running the backend API and PostgreSQL database.
+
+## 1. Prerequisites
+
+Make sure you have installed:
+
+- Docker
+- Docker Compose
+
+Create a `.env` file in the same directory as `docker-compose.yaml`:
+
+PG_DB_USER=...
+PG_DB_PASSWORD=...
+PG_DB_NAME=...
+PG_DB_SSL=false
+PG_MAX_CONNECTIONS=10
+PORT=3000
+JWT_SECRET=your_jwt_secret_key
+NODE_ENV=production
+
+## 2. Start the Application
+
+From the project root, run:
+
+docker compose up --build -d
+
+This will:
+
+1. Build the backend image
+2. Start the PostgreSQL database
+3. Wait for the database to become healthy
+4. Run migrations
+5. Launch the backend API
+
+The API will be available at:
+
+http://localhost:3000
+
+## 3. API Endpoints
+
+### Create a New User
+POST /api/user
+
+Use this endpoint to register a new user.
+
+Request Body:
+
+{
+  "email": "example@example.com",
+  "password": "your-password"
+  "name": "John"
+}
+
+Response Example (200 OK):
+
+{
+    "id": "8b7181fa-bbb4-40cc-ad83-a2472e98f0b4",
+    "email": "example@example.com",
+    "name": "John",
+    "createdAt": "2026-01-08T14:20:20.265Z"
+}
+
+---
+
+### Login
+POST /api/login
+
+Returns a JWT token for authenticated requests.
+
+Request Body Example:
+
+{
+  "email": "example@example.com",
+  "password": "your-password"
+}
+
+Response Example (200 OK):
+
+{
+  "id": "JWT_TOKEN_HERE",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6....."
+}
+
+---
+
+### Get Authenticated User Profile
+GET /api/user/profile
+
+Requires a valid JWT token in the Authorization header:
+
+Authorization: Bearer <your-token>
+
+Response Example:
+
+{
+    "id": "8b7181fa-bbb4-40cc-ad83-a2472e98f0b4",
+    "email": "example@example.com",
+    "name": "Jonh"
+}
+
+## 4. Stopping the Services
+
+To stop all containers:
+
+docker compose down
+
+To stop and remove volumes (including database data):
+
+docker compose down -v
+
+## 5. Troubleshooting
+
+- Ensure `.env` is in the same directory as `docker-compose.yml`
+- Ensure `.env` uses UTF-8 encoding and LF line endings
+- Run `docker compose config` to verify environment variables are loaded correctly
+- If the backend fails to connect to the database, ensure the DB container is healthy
+
+---
+
 # Database Migrations
 
 Below is a short explanation about migrations, seeders and the database schema.

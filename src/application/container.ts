@@ -1,5 +1,4 @@
 import { PostgresClient } from "../infrastructure/database/clients/PostgresClient";
-import { postgresPool as pool } from "../infrastructure/database/clients/postgresPool";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { BcryptPasswordHasher } from "../infrastructure/security/BcryptPasswordHasher";
 import { JwtAuthToken } from "../infrastructure/security/JwtToken";
@@ -10,8 +9,15 @@ import { GetUserProfile } from "../usecases/GetUserProfile";
 import { RegisterUserController } from "../interfaces/controllers/RegisterUserController";
 import { LoginUserController } from "../interfaces/controllers/LoginUserController";
 import { GetUserProfileController } from "../interfaces/controllers/GetUserProfileController";
+import { Pool } from "pg";
 
 // Infrastructure
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: process.env.PG_MAX_CONNECTIONS ? parseInt(process.env.PG_MAX_CONNECTIONS) : 10,
+  ssl: process.env.PG_DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+});
+
 const dbClient = new PostgresClient(pool);
 const userRepository = new UserRepository(dbClient);
 const passwordHasher = new BcryptPasswordHasher();

@@ -4,7 +4,6 @@ dotenv.config();
 import fs from "fs";
 import path from "path";
 import { Client } from "pg";
-import { databaseConfig } from "./config/database";
 
 async function ensureSeedersTable(client: Client) {
   await client.query(`
@@ -18,8 +17,8 @@ async function ensureSeedersTable(client: Client) {
 
 async function runSeeders(direction: "up" | "down") {
   const client = new Client({
-    connectionString: databaseConfig.url,
-    ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : false,
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.PG_DB_SSL === "true" ? { rejectUnauthorized: false } : false,
   });
   await client.connect();
 

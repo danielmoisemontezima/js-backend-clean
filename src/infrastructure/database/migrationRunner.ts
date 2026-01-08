@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { databaseConfig } from "./config/database";
 import { Client } from "pg";
 import fs from "fs";
 import path from "path";
@@ -18,8 +17,8 @@ async function ensureMigrationsTable(client: Client) {
 
 async function runMigrations(direction: "up" | "down") {
     const client = new Client({
-      connectionString: databaseConfig.url,
-      ssl: databaseConfig.ssl ? { rejectUnauthorized: false } : false, 
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.PG_DB_SSL === "true" ? { rejectUnauthorized: false } : false, 
     });
     await client.connect();
 
