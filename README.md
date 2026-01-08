@@ -11,14 +11,14 @@ Make sure you have installed:
 
 Create a `.env` file in the same directory as `docker-compose.yaml`:
 
-PG_DB_USER=...
-PG_DB_PASSWORD=...
-PG_DB_NAME=...
-PG_DB_SSL=false
-PG_MAX_CONNECTIONS=10
-PORT=3000
-JWT_SECRET=your_jwt_secret_key
-NODE_ENV=production
+PG_DB_USER=...  
+PG_DB_PASSWORD=...  
+PG_DB_NAME=...  
+PG_DB_SSL=false  
+PG_MAX_CONNECTIONS=10  
+PORT=3000  
+JWT_SECRET=your_jwt_secret_key  
+NODE_ENV=production  
 
 ## 2. Start the Application
 
